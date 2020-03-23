@@ -4,6 +4,8 @@ const app = express()
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
+const errormiddle = require('./middlewares/error_handler_for_routes')
+const routelog = require('./middlewares/route_logger')
 // const port = 3000
 
 // app.get('/', (req, a) => a.send('Hello World!'))
@@ -12,6 +14,9 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
 
+
+app.use(errormiddle.errorhandlerglobal)
+app.use(routelog.routelodger)
 const fs = require('fs');
 
 let routePath = './routes'
@@ -21,6 +26,8 @@ fs.readdirSync(routePath).forEach(function (file) {
         route.routes(app)
     }
 });
+
+app.use(errormiddle.routeError)
 
 let modelsPath = './models'
 fs.readdirSync(modelsPath).forEach(function (file) {
