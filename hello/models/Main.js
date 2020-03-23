@@ -35,7 +35,7 @@ let blogSchema = new Schema(
             type: String,
             default: ''
         },
-        tags: [],
+        tag: [],
         created: {
             type: Date,
             default: Date.now
@@ -48,6 +48,6 @@ let blogSchema = new Schema(
 
 )
 
-mongoose.model('Main', blogSchema);
+let dd = mongoose.model('Main', blogSchema);
 
-// module.exports = dd
+module.exports = dd
