@@ -3,7 +3,9 @@ const app = express()
 const mongoose = require('mongoose')
 const model = require('./../models/Main')
 const randomize = require('randomatic')
-
+const api = require('./../libs/response_structure')
+const time = require('./../libs/timezone')
+const repete = require('./../libs/repete')
 
 const blogModel = mongoose.model('Main');
 
@@ -13,7 +15,7 @@ let createBlog = (req, res) => {
 
     let blogId = randomize('A0a', 6);
     console.log(blogId)
-    let lastModified = Date.now()
+    let lastModified = time.localtime()
 
     let blogdata = new blogModel({
         blogId: blogId,
@@ -35,12 +37,15 @@ let createBlog = (req, res) => {
     blogdata.save((err, result) => {
         if (err) {
             console.log(`some error occured while creating blog`)
-            res.send(err)
-        } else if (result == undefined || result == null || result == '') {
+            let b = api.apiresponse(true, 'Something is broken', 500, err)
+            res.send(b)
+        } else if (repete.emptycheck(result)) {
+            let a = api.apiresponse(true, 'Blog is not created', 404, result)
             console.log(`some error occured while creating blog`)
-            res.send(err)
+            res.send(a)
         } else {
-            res.send(result)
+            let a = api.apiresponse(false, 'Blog created successfully', 200, result)
+            res.send(a)
         }
     })
 }
@@ -62,8 +67,15 @@ let selectBlog = (req, res) => {
     blogModel.findOne({ 'blogId': req.params.blogId }, (err, result) => {
         if (err) {
             console.log(`error while selecting blog`)
-        } else {
-            res.send(result)
+            let b = api.apiresponse(true, 'Something is broken', 500, null)
+            res.send(b)
+        } else if (repete.emptycheck(result)) {
+            let b = api.apiresponse(true, 'Something is broken', 404, result)
+            res.send(b)
+        }
+        else {
+            let a = api.apiresponse(false, 'Blog exist', 200, result)
+            res.send(a)
         }
     })
 }
@@ -96,7 +108,7 @@ let editBlog = (req, res) => {
 // delete blog
 
 let deleteBlog = (req, res) => {
-    blogModel.deleteOne({ 'blogId': req.params.blogId },((err, result) => {
+    blogModel.deleteOne({ 'blogId': req.params.blogId }, ((err, result) => {
         if (err) {
             console.log(`error while deleting the blog`)
         } else {
