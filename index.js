@@ -6,6 +6,10 @@ const bodyParser = require('body-parser') //middleware body
 const cookieParser = require('cookie-parser') //third party middleware
 const errormiddle = require('./middlewares/error_handler_for_routes')
 const routelog = require('./middlewares/route_logger')
+const apiToken = require('./auth/token')
+const http = require('http')
+const helmet = require('helmet')
+
 // const port = 3000
 
 // app.get('/', (req, a) => a.send('Hello World!'))
@@ -17,15 +21,18 @@ app.use(cookieParser())
 
 app.use(errormiddle.errorhandlerglobal)
 app.use(routelog.routelodger)
+app.use(helmet())
 const fs = require('fs');
 
 let routePath = './routes'
 fs.readdirSync(routePath).forEach(function (file) {
     if (~file.indexOf('.js')) {
         let route = require(routePath + '/' + file)
+        console.log(file)
         route.routes(app)
     }
 });
+
 
 app.use(errormiddle.routeError)
 
@@ -41,6 +48,22 @@ app.listen(model.port, async () => {
     let db = mongoose.connect(model.db.uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 })
+
+// const server = http.createServer(app)
+// server.listen(model.port)
+// server.on('error', onError)
+// server.on('listen', onListen)
+
+// function onError(error){
+//     if(error.syscall !=='listen'){
+//         throw error
+//     }
+//     switch (error.code){
+//         case 'EACCES'
+//         process.exit(1)
+//         break
+//     }
+// }
 mongoose.set('useCreateIndex', true)
 mongoose.connection.on('error', function (err) {
     console.log(`error in database connection`)

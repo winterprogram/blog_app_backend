@@ -6,9 +6,10 @@ const randomize = require('randomatic')
 const api = require('./../libs/response_structure')
 const time = require('./../libs/timezone')
 const repete = require('./../libs/repete')
+const logger = require('./../libs/logger')
 
 const blogModel = mongoose.model('Main');
-
+    
 // create blog 
 
 let createBlog = (req, res) => {
@@ -71,6 +72,7 @@ let selectBlog = (req, res) => {
             res.send(b)
         } else if (repete.emptycheck(result)) {
             let b = api.apiresponse(true, 'Something is broken', 404, result)
+            logger.errorlogs('Something is broken', 'Error @ Select Blog', 'GET', 10)
             res.send(b)
         }
         else {
